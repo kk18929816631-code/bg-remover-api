@@ -134,6 +134,9 @@ body {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
   gap: 6px;
 }
 .btn:active { transform: translateY(0); }
@@ -152,8 +155,8 @@ body {
 .btn-danger { background: var(--danger); color: var(--white); }
 .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
 
-.btn-sm { height: 34px; padding: 0 16px; font-size: 12px; border-radius: 17px; }
-.btn-xs { height: 28px; padding: 0 12px; font-size: 11px; border-radius: 14px; }
+.btn-sm { height: 34px; padding: 0 16px; font-size: 12px; border-radius: 17px; line-height: 1; }
+.btn-xs { height: 28px; padding: 0 12px; font-size: 11px; border-radius: 14px; line-height: 1; }
 
 .badge {
   display: inline-block; padding: 3px 10px; background: var(--accent);
@@ -262,8 +265,10 @@ body {
   font-size: 12px; font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 8px;
   padding: 0 12px;
+  line-height: 1;
   transition: all var(--transition);
 }
 .tool-btn:hover { color: var(--white); border-color: var(--border); }
@@ -558,8 +563,10 @@ body {
         </div>
       </div>
       <div class="preview-actions">
+        <button class="btn btn-primary" id="processBtn" style="display:none">AI 智能抠图</button>
+        <button class="btn btn-outline" id="editBtn" style="display:none">精细编辑</button>
+        <button class="btn btn-outline" id="manualEditBtn" style="display:none">手动编辑</button>
         <button class="btn btn-primary" id="downloadBtn" disabled>下载 PNG</button>
-        <button class="btn btn-outline" id="editBtn" style="display:none">编辑</button>
         <button class="btn btn-outline btn-sm" id="clearImgBtn" style="display:none">删除图片</button>
         <button class="btn btn-outline btn-sm" id="clearResultBtn" style="display:none">删除结果</button>
       </div>
@@ -705,7 +712,9 @@ const afterBox = $('afterBox');
 const afterImg = $('afterImg');
 const afterPh = afterBox.querySelector('.image-placeholder');
 const downloadBtn = $('downloadBtn');
+const processBtn = $('processBtn');
 const editBtn = $('editBtn');
+const manualEditBtn = $('manualEditBtn');
 const clearImgBtn = $('clearImgBtn');
 const clearResultBtn = $('clearResultBtn');
 const statusSpan = beforeBox.querySelector('.processing-indicator span');
@@ -821,7 +830,10 @@ function goIdle() {
   resultBlob = null;
   beforeImg.src = ''; beforeImg.style.display = 'none'; beforePh.style.display = '';
   afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
+  processBtn.style.display = 'none';
+  manualEditBtn.style.display = 'none';
   downloadBtn.disabled = true;
+  downloadBtn.style.display = 'none';
   editBtn.style.display = 'none';
   clearImgBtn.style.display = 'none';
   clearResultBtn.style.display = 'none';
@@ -835,18 +847,24 @@ function goIdle() {
 function goUploaded() {
   setPhase('uploaded');
   uploadBtn.textContent = '重新选择';
-  statusText.textContent = '点击编辑或重新上传';
+  statusText.textContent = '选择操作：AI 智能抠图 或 手动编辑';
+  processBtn.style.display = '';
+  manualEditBtn.style.display = '';
   editBtn.style.display = 'none';
+  downloadBtn.style.display = 'none';
   clearImgBtn.style.display = '';
   clearResultBtn.style.display = 'none';
 }
 
 function goDone() {
   setPhase('done');
+  processBtn.style.display = 'none';
+  manualEditBtn.style.display = 'none';
   editBtn.style.display = '';
+  downloadBtn.style.display = '';
+  downloadBtn.disabled = false;
   clearImgBtn.style.display = '';
   clearResultBtn.style.display = '';
-  downloadBtn.disabled = false;
   statusText.textContent = '处理完成';
 }
 
@@ -907,7 +925,6 @@ function handleFile(file) {
   thumbOrigImg.src = url; thumbOrigImg.style.display = 'block'; thumbOrigPh.style.display = 'none';
 
   goUploaded();
-  removeBackground(file);
 }
 
 uploadBtn.addEventListener('click', () => fileInput.click());
@@ -944,17 +961,17 @@ function downloadBlob(blob) {
 }
 
 // Clear actions
-clearImgBtn.addEventListener('click', () => { if (phase !== 'editing') goIdle(); });
+clearImgBtn.addEventListener('click', () => {
+  exitEditor();
+  goIdle();
+  showToast('图片已删除');
+});
 clearResultBtn.addEventListener('click', () => {
-  if (phase !== 'editing') {
-    resultBlob = null;
-    afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
-    thumbResImg.src = ''; thumbResImg.style.display = 'none'; thumbResPh.style.display = '';
-    downloadBtn.disabled = true;
-    editBtn.style.display = 'none';
-    clearResultBtn.style.display = 'none';
-    goUploaded();
-  }
+  resultBlob = null;
+  afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
+  thumbResImg.src = ''; thumbResImg.style.display = 'none'; thumbResPh.style.display = '';
+  goUploaded();
+  showToast('结果已删除');
 });
 
 // ==================== Canvas Core ====================
@@ -1013,6 +1030,49 @@ async function enterEditor() {
 
   render();
   showToast('编辑器中：使用左侧工具修改抠图结果');
+}
+
+async function enterEditorForManual() {
+  if (!originalFile) return;
+
+  setPhase('editing');
+  uploadCard.style.display = 'none';
+
+  sourceImg = await loadImage(originalFile);
+  resultImg = sourceImg;
+
+  const maxDim = 1200;
+  const w = sourceImg.naturalWidth;
+  const h = sourceImg.naturalHeight;
+  const scale = Math.min(1, maxDim / Math.max(w, h));
+  canvasW = Math.round(w * scale);
+  canvasH = Math.round(h * scale);
+
+  editCanvas.width = canvasW;
+  editCanvas.height = canvasH;
+
+  maskCanvas = document.createElement('canvas');
+  maskCanvas.width = canvasW;
+  maskCanvas.height = canvasH;
+  maskCtx = maskCanvas.getContext('2d');
+  maskCtx.fillStyle = '#fff';
+  maskCtx.fillRect(0, 0, canvasW, canvasH);
+
+  zoom = 1;
+  panX = 0;
+  panY = 0;
+  undoStack = [];
+  redoStack = [];
+  undoBtn.disabled = true;
+  redoBtn.disabled = true;
+  clearSelection();
+  fitCanvas();
+
+  thumbOriginal.classList.add('active');
+  thumbResult.classList.remove('active');
+
+  render();
+  showToast('手动编辑模式：使用画笔/套索/魔术棒擦除背景');
 }
 
 function fitCanvas() {
@@ -1622,6 +1682,13 @@ backToDefaultBtn.addEventListener('click', () => {
 });
 
 // ==================== Edit Button ====================
+processBtn.addEventListener('click', () => {
+  if (!originalFile) return;
+  removeBackground(originalFile);
+});
+
+manualEditBtn.addEventListener('click', () => enterEditorForManual());
+
 editBtn.addEventListener('click', () => enterEditor());
 
 // ==================== Keyboard Shortcuts ====================
