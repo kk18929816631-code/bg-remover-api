@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>koukou app - AI 智能抠图 RMBG</title>
+<title>koukou app - AI 智能抠图</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,6 +14,9 @@
   --card: #1A1A24;
   --accent: #00C896;
   --accent-hover: #00A87D;
+  --accent-dim: rgba(0,200,150,0.15);
+  --danger: #E0556A;
+  --danger-hover: #C94A5E;
   --white: #FFFFFF;
   --text: #EFEFF5;
   --sub: #808094;
@@ -38,6 +41,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  user-select: none;
 }
 
 .ambient-glow {
@@ -92,75 +96,121 @@ body {
 
 .main { max-width: 1440px; margin: 0 auto; padding-top: var(--header-h); position: relative; z-index: 1; min-height: 100vh; }
 
-.hero { padding: 96px var(--margin) 0; }
-.hero h1 { font-size: 64px; font-weight: 800; line-height: 1.125; color: var(--white); letter-spacing: -1.5px; }
-.hero h2 { font-size: 56px; font-weight: 800; line-height: 1.143; color: var(--sub); margin-top: 8px; letter-spacing: -1.2px; }
-.hero p { font-size: 17px; color: var(--sub); margin-top: 24px; line-height: 1.5; }
+.hero { padding: 72px var(--margin) 0; }
+.hero h1 { font-size: 56px; font-weight: 800; line-height: 1.125; color: var(--white); letter-spacing: -1.5px; }
+.hero h2 { font-size: 20px; font-weight: 500; color: var(--sub); margin-top: 12px; }
 
-.content-row { display: flex; gap: 60px; padding: 65px var(--margin) 0; align-items: flex-start; }
+.api-key-row {
+  display: flex;
+  justify-content: center;
+  padding: 28px var(--margin) 0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.api-key-input {
+  width: 320px; height: 44px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--white);
+  padding: 0 20px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.api-key-input:focus { border-color: var(--accent); }
+
+.btn {
+  height: 44px; padding: 0 24px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition), transform var(--transition), opacity var(--transition);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary { background: var(--accent); color: var(--white); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--sub);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover:not(:disabled) { color: var(--white); border-color: var(--sub); }
+
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+
+.btn-sm { height: 34px; padding: 0 16px; font-size: 12px; border-radius: 17px; }
+.btn-xs { height: 28px; padding: 0 12px; font-size: 11px; border-radius: 14px; }
+
+.badge {
+  display: inline-block; padding: 3px 10px; background: var(--accent);
+  color: #0A0A0F; font-size: 11px; font-weight: 700; border-radius: 10px; margin-left: 8px; vertical-align: middle;
+}
+
+/* Upload area */
+.content-row { display: flex; gap: 60px; padding: 40px var(--margin) 0; align-items: flex-start; }
 
 .upload-card {
-  width: 460px; min-width: 460px; height: 353px;
+  width: 460px; min-width: 460px;
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius); display: flex; flex-direction: column;
-  align-items: center; padding: 48px 0 0; position: relative;
+  align-items: center; padding: 48px 32px;
+  position: relative;
   transition: border-color var(--transition), box-shadow var(--transition);
 }
-.upload-card.drag-over { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,200,150,0.15); }
+.upload-card.drag-over { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-dim); }
 
 .upload-icon-circle { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .upload-icon-circle svg { width: 24px; height: 24px; stroke: white; }
 
-.upload-text { font-size: 16px; font-weight: 500; color: var(--white); margin-top: 24px; }
+.upload-text { font-size: 16px; font-weight: 500; color: var(--white); margin-top: 24px; text-align: center; }
 .upload-hint { font-size: 13px; color: var(--sub); margin-top: 10px; }
 
-.upload-btn {
-  margin-top: 28px; width: 180px; height: 48px; border-radius: 24px;
-  background: var(--accent); color: var(--white); font-size: 15px;
-  font-weight: 600; border: none; cursor: pointer;
-  transition: background var(--transition), transform var(--transition); font-family: inherit;
-}
-.upload-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
-.upload-btn:active { transform: translateY(0); }
-.upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.upload-time { font-size: 12px; color: var(--sub); margin-top: 18px; }
+.upload-time { font-size: 12px; color: var(--sub); margin-top: 18px; text-align: center; }
 .hidden-input { display: none; }
 
 .preview-card {
-  flex: 1; height: 353px; background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 17px 40px 0 24px; display: flex; flex-direction: column;
+  flex: 1;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  display: flex; flex-direction: column;
+  min-height: 353px;
 }
-.preview-label { font-size: 16px; font-weight: 700; color: var(--sub); letter-spacing: 2px; margin-left: 12px; margin-bottom: 10px; }
-.preview-images { display: flex; align-items: center; }
+.preview-label { font-size: 14px; font-weight: 700; color: var(--sub); letter-spacing: 2px; margin-bottom: 14px; }
+.preview-images { display: flex; align-items: center; gap: 12px; }
 
 .image-box {
-  width: 292px; height: 240px; border-radius: var(--radius-sm);
+  width: 260px; height: 220px; border-radius: var(--radius-sm);
   background: var(--surface); display: flex; align-items: center;
   justify-content: center; position: relative; overflow: hidden; flex-shrink: 0;
+  border: 1px solid var(--border);
 }
 .image-box img { width: 100%; height: 100%; object-fit: contain; }
 
 .image-tag {
-  position: absolute; top: 10px; left: 12px; height: 24px; padding: 0 8px;
+  position: absolute; top: 8px; left: 10px; height: 22px; padding: 0 8px;
   border-radius: var(--radius-xs); font-size: 10px; font-weight: 600;
   color: var(--white); display: flex; align-items: center; z-index: 2;
 }
 .image-tag.before { background: var(--tag-before-bg); }
 .image-tag.after { background: var(--accent); }
 
-.image-placeholder { font-size: 44px; opacity: 0.25; color: var(--sub); user-select: none; }
+.image-placeholder { font-size: 40px; opacity: 0.25; color: var(--sub); user-select: none; }
 
-.preview-arrow { font-size: 16px; color: var(--accent); font-weight: 700; flex-shrink: 0; margin: 0 8px; }
-
-.download-btn {
-  width: 140px; height: 42px; border-radius: 21px; background: var(--accent);
-  color: var(--white); font-size: 14px; font-weight: 600; border: none;
-  cursor: pointer; transition: background var(--transition); font-family: inherit;
-  margin-left: 400px; margin-top: 11px; margin-bottom: auto;
-}
-.download-btn:hover { background: var(--accent-hover); }
-.download-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.preview-arrow { font-size: 16px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
 
 .processing-indicator {
   display: none; position: absolute; inset: 0; flex-direction: column;
@@ -173,6 +223,205 @@ body {
 .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.preview-actions { display: flex; gap: 10px; margin-top: auto; padding-top: 14px; flex-wrap: wrap; }
+
+/* ====== Editor Styles ====== */
+.editor-workspace {
+  display: none;
+  gap: 16px;
+  padding: 32px var(--margin) 0;
+  align-items: flex-start;
+  height: calc(100vh - var(--header-h) - 80px);
+  min-height: 500px;
+}
+
+.editor-workspace.active { display: flex; }
+
+/* Toolbar */
+.toolbar {
+  width: 180px; min-width: 180px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.tool-group { display: flex; flex-direction: column; gap: 4px; }
+
+.tool-group-label {
+  font-size: 10px; font-weight: 600; color: var(--sub);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 2px; padding: 0 4px;
+}
+
+.tool-btn {
+  width: 100%; height: 40px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--surface);
+  color: var(--sub);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px;
+  transition: all var(--transition);
+}
+.tool-btn:hover { color: var(--white); border-color: var(--border); }
+.tool-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.tool-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.tool-slider {
+  width: 100%; margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+}
+.tool-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.tool-slider-value { font-size: 11px; color: var(--sub); text-align: center; }
+
+.mode-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.mode-btn {
+  flex: 1; height: 32px;
+  border: none;
+  background: var(--surface);
+  color: var(--sub);
+  font-size: 11px; font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.mode-btn.active { background: var(--accent); color: var(--white); }
+
+.tool-separator { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* Canvas */
+.canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='8' height='8' fill='%23222'/%3E%3Crect x='8' width='8' height='8' fill='%23333'/%3E%3Crect y='8' width='8' height='8' fill='%23333'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23222'/%3E%3C/svg%3E");
+  background-size: 16px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-container canvas {
+  display: block;
+  image-rendering: auto;
+}
+
+.canvas-container.eraser-cursor { cursor: none; }
+.canvas-container.lasso-cursor { cursor: crosshair; }
+.canvas-container.wand-cursor { cursor: pointer; }
+
+.brush-preview {
+  position: absolute;
+  border: 2px dashed rgba(255,255,255,0.7);
+  border-radius: 50%;
+  pointer-events: none;
+  display: none;
+  transform: translate(-50%, -50%);
+}
+
+.canvas-zoom-info {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: var(--sub);
+  background: rgba(10,10,15,0.8);
+  padding: 4px 10px;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.floating-actions {
+  position: absolute;
+  display: none;
+  gap: 6px;
+  z-index: 10;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.floating-actions.show { display: flex; }
+
+/* Side panel */
+.side-panel {
+  width: 240px; min-width: 240px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.side-section {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px;
+}
+
+.side-section-title {
+  font-size: 11px; font-weight: 600; color: var(--sub);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+
+.side-thumbs { display: flex; gap: 8px; }
+
+.side-thumb {
+  width: 96px; height: 80px;
+  border-radius: 10px;
+  background: var(--surface);
+  display: flex; align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color var(--transition);
+  position: relative;
+}
+.side-thumb:hover { border-color: var(--border); }
+.side-thumb.active { border-color: var(--accent); }
+.side-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.side-thumb .thumb-placeholder { font-size: 24px; opacity: 0.25; color: var(--sub); }
+.side-thumb .thumb-delete {
+  position: absolute; top: 2px; right: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center; justify-content: center;
+  line-height: 1;
+}
+.side-thumb:hover .thumb-delete { display: flex; }
+
+.side-actions { display: flex; flex-direction: column; gap: 8px; }
+
+/* Footer */
 .footer {
   max-width: 1440px; margin: 132px auto 0; height: 72px;
   background: var(--footer-bg); border-top: 1px solid rgba(38,38,46,0.5);
@@ -182,74 +431,67 @@ body {
 .footer-links { font-size: 14px; color: var(--footer-text); display: flex; gap: 8px; }
 .footer-links a { color: var(--footer-text); text-decoration: none; transition: color var(--transition); }
 
-.badge {
-  display: inline-block; padding: 3px 10px; background: var(--accent);
-  color: #0A0A0F; font-size: 11px; font-weight: 700; border-radius: 10px; margin-left: 8px; vertical-align: middle;
+/* Status toast */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 13px;
+  z-index: 200;
+  transition: transform 0.3s ease;
+  pointer-events: none;
 }
+.toast.show { transform: translateX(-50%) translateY(0); }
 
+/* Responsive */
 @media (max-width: 1280px) {
-  :root { --margin: 60px; }
-  .hero h1 { font-size: 48px; }
-  .hero h2 { font-size: 40px; }
+  :root { --margin: 40px; }
+  .hero h1 { font-size: 40px; }
   .content-row { flex-direction: column; align-items: center; }
   .upload-card { width: 100%; min-width: unset; max-width: 500px; }
-  .preview-card { width: 100%; max-width: 700px; padding: 17px 24px 0 24px; }
+  .preview-card { width: 100%; max-width: 700px; }
   .preview-images { flex-wrap: wrap; justify-content: center; }
-  .image-box { width: 45%; min-width: 200px; }
+  .image-box { width: 45%; min-width: 180px; }
   .nav { display: none; }
-  .header { padding: 0 24px; }
-  .header-cta { padding: 8px 18px; font-size: 12px; }
+  .editor-workspace { flex-direction: column; height: auto; }
+  .toolbar { width: 100%; min-width: unset; flex-direction: row; flex-wrap: wrap; gap: 6px; padding: 10px; }
+  .tool-btn { width: auto; padding: 0 14px; }
+  .tool-group { flex-direction: row; align-items: center; gap: 6px; }
+  .tool-group-label { margin-bottom: 0; }
+  .tool-slider { width: 80px; }
+  .side-panel { width: 100%; min-width: unset; flex-direction: row; flex-wrap: wrap; }
+  .side-section { flex: 1; min-width: 200px; }
 }
 
 @media (max-width: 768px) {
-  :root { --margin: 20px; --header-h: 60px; --radius: 16px; --radius-sm: 12px; }
-  .ambient-glow { width: 100vw; height: 280px; opacity: 0.6; }
-  .header { padding: 0 16px; height: var(--header-h); }
+  :root { --margin: 16px; --header-h: 60px; }
+  .ambient-glow { width: 100vw; height: 200px; opacity: 0.5; }
+  .header { padding: 0 16px; }
   .logo { font-size: 18px; }
-  .header-cta { padding: 8px 16px; font-size: 12px; border-radius: 16px; }
-  .hero { padding: 60px var(--margin) 0; }
-  .hero h1 { font-size: 30px; letter-spacing: -0.8px; }
-  .hero h2 { font-size: 24px; letter-spacing: -0.5px; }
-  .hero p { font-size: 14px; margin-top: 16px; }
-  .content-row { padding: 32px var(--margin) 0; gap: 24px; }
-  .upload-card { height: auto; padding: 36px 20px 28px; width: 100%; max-width: 100%; }
-  .upload-icon-circle { width: 48px; height: 48px; }
-  .upload-icon-circle svg { width: 20px; height: 20px; }
-  .upload-text { font-size: 15px; margin-top: 20px; }
-  .upload-hint { font-size: 12px; margin-top: 8px; }
-  .upload-btn { width: 100%; max-width: 260px; height: 46px; font-size: 15px; margin-top: 22px; border-radius: 23px; }
-  .upload-time { font-size: 11px; margin-top: 14px; }
-  .preview-card { height: auto; padding: 20px 16px; width: 100%; max-width: 100%; }
-  .preview-label { font-size: 14px; letter-spacing: 1.5px; margin-left: 4px; margin-bottom: 8px; }
-  .preview-images { flex-direction: column; gap: 10px; align-items: center; }
-  .image-box { width: 100%; max-width: 360px; height: 200px; }
-  .preview-arrow { transform: rotate(90deg); margin: 2px 0; font-size: 18px; }
-  .download-btn { width: 100%; max-width: 200px; height: 44px; margin: 20px auto 0; }
-  .footer { flex-direction: column; gap: 10px; justify-content: center; height: auto; padding: 20px var(--margin); margin-top: 60px; }
-  .footer-copy { font-size: 12px; text-align: center; }
-  .footer-links { font-size: 12px; gap: 12px; flex-wrap: wrap; justify-content: center; }
-}
-
-@media (max-width: 400px) {
-  :root { --margin: 16px; --header-h: 54px; --radius: 14px; --radius-sm: 10px; }
-  .ambient-glow { height: 200px; opacity: 0.4; }
-  .hero { padding: 50px var(--margin) 0; }
-  .hero h1 { font-size: 26px; }
-  .hero h2 { font-size: 21px; }
-  .hero p { font-size: 13px; }
-  .content-row { padding-top: 24px; gap: 18px; }
-  .upload-card { padding: 28px 16px 24px; }
-  .upload-icon-circle { width: 42px; height: 42px; }
-  .upload-btn { height: 44px; font-size: 14px; max-width: 100%; }
-  .image-box { height: 160px; }
-  .preview-card { padding: 16px 12px; }
-  .download-btn { height: 42px; font-size: 14px; max-width: 100%; }
-  .footer { padding: 16px var(--margin); margin-top: 40px; }
-  .footer-links { font-size: 11px; gap: 8px; }
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .upload-btn, .download-btn, .header-cta { min-height: 44px; }
+  .header-cta { padding: 8px 16px; font-size: 12px; }
+  .hero { padding: 48px var(--margin) 0; }
+  .hero h1 { font-size: 28px; }
+  .hero h2 { font-size: 16px; }
+  .content-row { padding: 24px var(--margin) 0; gap: 16px; }
+  .upload-card { padding: 32px 20px; }
+  .upload-btn { width: 100%; max-width: 260px; }
+  .preview-card { padding: 16px; }
+  .preview-images { flex-direction: column; }
+  .image-box { width: 100%; max-width: 300px; height: 180px; }
+  .preview-arrow { transform: rotate(90deg); }
+  .editor-workspace { padding: 16px var(--margin) 0; gap: 8px; }
+  .canvas-container { min-height: 350px; }
+  .side-panel { flex-direction: column; }
+  .side-thumbs { justify-content: center; }
+  .footer { padding: 16px var(--margin); margin-top: 40px; flex-direction: column; gap: 8px; justify-content: center; height: auto; }
+  .footer-copy, .footer-links { font-size: 12px; }
+  .api-key-input { width: 100%; }
 }
 </style>
 </head>
@@ -271,18 +513,17 @@ body {
 <main class="main">
   <section class="hero">
     <h1>一键去除背景 <span class="badge">remove.bg</span></h1>
-	    <h2>专业背景去除 API，快速稳定</h2>
-	    <p>调用 remove.bg API，无需下载模型，处理速度快，每月 50 张免费。</p>
+    <h2>专业背景去除 API · 精细编辑 · 快速稳定</h2>
   </section>
 
-  
-	  <div class="api-key-row" style="display:flex; justify-content:center; padding: 32px var(--margin) 0; gap: 12px;">
-	    <input type="password" id="apiKeyInput" placeholder="输入 Remove.bg API Key" style="width:320px; height:44px; border-radius:22px; border:1px solid var(--border); background:var(--card); color:var(--white); padding:0 20px; font-size:14px; font-family:inherit; outline:none; transition:border-color var(--transition);">
-	    <button id="saveKeyBtn" style="height:44px; padding:0 24px; border-radius:22px; background:var(--accent); color:var(--white); font-size:14px; font-weight:600; border:none; cursor:pointer; font-family:inherit; white-space:nowrap;">保存 Key</button>
-	    <span id="keyStatus" style="font-size:12px; color:var(--sub); line-height:44px;"></span>
-	  </div>
+  <div class="api-key-row">
+    <input type="password" id="apiKeyInput" class="api-key-input" placeholder="输入 Remove.bg API Key">
+    <button id="saveKeyBtn" class="btn btn-primary">保存 Key</button>
+    <span id="keyStatus" style="font-size:12px; color:var(--sub); line-height:44px;"></span>
+  </div>
 
-	  <div class="content-row">
+  <!-- Upload + Preview (default view) -->
+  <div class="content-row" id="contentRow">
     <div class="upload-card" id="uploadCard">
       <div class="upload-icon-circle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -292,7 +533,7 @@ body {
       </div>
       <div class="upload-text">拖拽图片到此处，或点击上传</div>
       <div class="upload-hint">支持 PNG / JPG / WebP，最大 10MB</div>
-      <button class="upload-btn" id="uploadBtn">选择图片</button>
+      <button class="btn btn-primary" id="uploadBtn" style="margin-top:28px; width:180px;">选择图片</button>
       <div class="upload-time" id="statusText">设置 API Key 后即可使用</div>
       <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden-input" id="fileInput">
     </div>
@@ -316,7 +557,124 @@ body {
           <img id="afterImg" src="" alt="" style="display:none">
         </div>
       </div>
-      <button class="download-btn" id="downloadBtn" disabled>下载 PNG</button>
+      <div class="preview-actions">
+        <button class="btn btn-primary" id="downloadBtn" disabled>下载 PNG</button>
+        <button class="btn btn-outline" id="editBtn" style="display:none">编辑</button>
+        <button class="btn btn-outline btn-sm" id="clearImgBtn" style="display:none">删除图片</button>
+        <button class="btn btn-outline btn-sm" id="clearResultBtn" style="display:none">删除结果</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor Workspace (hidden by default) -->
+  <div class="editor-workspace" id="editorWorkspace">
+    <!-- Toolbar -->
+    <div class="toolbar" id="toolbar">
+      <div class="tool-group">
+        <div class="tool-group-label">工具</div>
+        <button class="tool-btn active" data-tool="eraser">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.3 2a2 2 0 0 1 2.8 0l4.9 4.9a2 2 0 0 1 0 2.8L12 19"/>
+            <line x1="6" y1="20" x2="8" y2="14"/>
+          </svg>
+          擦除画笔
+        </button>
+        <button class="tool-btn" data-tool="lasso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4c6 2 8 10 14 6"/>
+            <path d="M18 10c2-4 2-6-4-6"/>
+            <circle cx="6" cy="20" r="1.5" fill="currentColor"/>
+          </svg>
+          绳索套索
+        </button>
+        <button class="tool-btn" data-tool="wand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 4V2m0 14v-2m8-5h-2M7 12H5m12.07-7.07-1.41 1.41M8.34 15.66l-1.41 1.41"/>
+            <circle cx="12" cy="12" r="7"/>
+            <line x1="12" y1="2" x2="12" y2="6"/>
+          </svg>
+          智能选取
+        </button>
+      </div>
+
+      <div class="tool-separator"></div>
+
+      <div class="tool-group" id="brushGroup">
+        <div class="tool-group-label">画笔大小</div>
+        <input type="range" class="tool-slider" id="brushSize" min="2" max="200" value="30">
+        <div class="tool-slider-value"><span id="brushSizeVal">30</span>px</div>
+      </div>
+
+      <div class="tool-group" id="modeGroup">
+        <div class="tool-group-label">模式</div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" data-mode="erase">擦除</button>
+          <button class="mode-btn" data-mode="restore">恢复</button>
+        </div>
+      </div>
+
+      <div class="tool-group" id="toleranceGroup" style="display:none">
+        <div class="tool-group-label">容差</div>
+        <input type="range" class="tool-slider" id="tolerance" min="1" max="100" value="25">
+        <div class="tool-slider-value"><span id="toleranceVal">25</span></div>
+      </div>
+
+      <div class="tool-separator"></div>
+
+      <button class="btn btn-outline btn-sm" id="clearSelectionBtn" style="display:none; width:100%">清除选区 (Esc)</button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-container" id="canvasContainer">
+      <canvas id="editCanvas"></canvas>
+      <div class="brush-preview" id="brushPreview"></div>
+      <div class="canvas-zoom-info" id="zoomInfo">100%</div>
+      <div class="floating-actions" id="floatingActions">
+        <button class="btn btn-danger btn-xs" data-action="delete">删除选区</button>
+        <button class="btn btn-primary btn-xs" data-action="restore">恢复选区</button>
+        <button class="btn btn-outline btn-xs" data-action="cancel">取消</button>
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="side-panel">
+      <div class="side-section">
+        <div class="side-section-title">预览</div>
+        <div class="side-thumbs">
+          <div class="side-thumb active" id="thumbOriginal" title="查看原图 - 按住预览">
+            <span class="thumb-placeholder">🖼</span>
+            <img src="" alt="" style="display:none">
+          </div>
+          <div class="side-thumb" id="thumbResult" title="查看结果">
+            <span class="thumb-placeholder">✨</span>
+            <img src="" alt="" style="display:none">
+          </div>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <div class="side-section-title">操作</div>
+        <div class="side-actions">
+          <button class="btn btn-outline btn-sm" id="undoBtn" disabled>↩ 撤销</button>
+          <button class="btn btn-outline btn-sm" id="redoBtn" disabled>↪ 重做</button>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <div class="side-actions">
+          <button class="btn btn-primary" id="applyBtn">应用编辑</button>
+          <button class="btn btn-outline btn-sm" id="cancelEditBtn">取消编辑</button>
+          <button class="btn btn-outline btn-sm" id="editorDownloadBtn">下载 PNG</button>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <div class="side-actions">
+          <button class="btn btn-outline btn-sm" id="editorClearImgBtn">删除图片</button>
+          <button class="btn btn-outline btn-sm" id="editorClearResultBtn">删除结果</button>
+          <button class="btn btn-outline btn-sm" id="backToDefaultBtn">返回</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -331,30 +689,98 @@ body {
   </footer>
 </main>
 
-<script type="module">
-const uploadBtn = document.getElementById('uploadBtn');
-const statusText = document.getElementById('statusText');
-const fileInput = document.getElementById('fileInput');
-const beforeBox = document.getElementById('beforeBox');
-const beforeImg = document.getElementById('beforeImg');
-const beforePh = beforeBox.querySelector('.image-placeholder');
-const afterBox = document.getElementById('afterBox');
-const afterImg = document.getElementById('afterImg');
-const afterPh = afterBox.querySelector('.image-placeholder');
-const downloadBtn = document.getElementById('downloadBtn');
-const statusSpan = beforeBox.querySelector('.processing-indicator span');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const saveKeyBtn = document.getElementById('saveKeyBtn');
-const keyStatus = document.getElementById('keyStatus');
+<div class="toast" id="toast"></div>
 
-let originalFile = null;
-let resultBlob = null;
+<script type="module">
+// ==================== DOM Refs ====================
+const $ = id => document.getElementById(id);
+const uploadCard = $('uploadCard');
+const uploadBtn = $('uploadBtn');
+const statusText = $('statusText');
+const fileInput = $('fileInput');
+const beforeBox = $('beforeBox');
+const beforeImg = $('beforeImg');
+const beforePh = beforeBox.querySelector('.image-placeholder');
+const afterBox = $('afterBox');
+const afterImg = $('afterImg');
+const afterPh = afterBox.querySelector('.image-placeholder');
+const downloadBtn = $('downloadBtn');
+const editBtn = $('editBtn');
+const clearImgBtn = $('clearImgBtn');
+const clearResultBtn = $('clearResultBtn');
+const statusSpan = beforeBox.querySelector('.processing-indicator span');
+const apiKeyInput = $('apiKeyInput');
+const saveKeyBtn = $('saveKeyBtn');
+const keyStatus = $('keyStatus');
+const contentRow = $('contentRow');
+const editorWorkspace = $('editorWorkspace');
+const canvasContainer = $('canvasContainer');
+const editCanvas = $('editCanvas');
+const brushPreview = $('brushPreview');
+const zoomInfo = $('zoomInfo');
+const floatingActions = $('floatingActions');
+const toast = $('toast');
+
+// Side panel refs
+const thumbOriginal = $('thumbOriginal');
+const thumbResult = $('thumbResult');
+const thumbOrigImg = thumbOriginal.querySelector('img');
+const thumbOrigPh = thumbOriginal.querySelector('.thumb-placeholder');
+const thumbResImg = thumbResult.querySelector('img');
+const thumbResPh = thumbResult.querySelector('.thumb-placeholder');
+const undoBtn = $('undoBtn');
+const redoBtn = $('redoBtn');
+const applyBtn = $('applyBtn');
+const cancelEditBtn = $('cancelEditBtn');
+const editorDownloadBtn = $('editorDownloadBtn');
+const editorClearImgBtn = $('editorClearImgBtn');
+const editorClearResultBtn = $('editorClearResultBtn');
+const backToDefaultBtn = $('backToDefaultBtn');
 
 const PROXY_URL = 'https://bg-remover-api-seven.vercel.app/api';
-	const API_URL = PROXY_URL + '/removebg';
+const API_URL = PROXY_URL + '/removebg';
 
-// API Key management
+// ==================== State ====================
 let apiKey = localStorage.getItem('removebg_key') || '';
+let originalFile = null;
+let resultBlob = null;
+let phase = 'idle'; // idle | uploaded | processing | done | editing
+
+// Canvas state
+let sourceImg = null;
+let resultImg = null;
+let maskCanvas = null;
+let maskCtx = null;
+let canvasW = 0, canvasH = 0;
+let zoom = 1, panX = 0, panY = 0;
+let isPanning = false;
+let panStartX = 0, panStartY = 0;
+let panStartPX = 0, panStartPY = 0;
+
+// Tool state
+let activeTool = 'eraser';
+let brushSize = 30;
+let eraseMode = 'erase'; // 'erase' | 'restore'
+let tolerance = 25;
+
+// Eraser
+let eraserDown = false;
+let eraserLastX = 0, eraserLastY = 0;
+
+// Lasso
+let lassoPoints = [];
+let lassoClosed = false;
+
+// Smart select
+let selectionMask = null; // Uint8Array for selection
+let hasSelection = false;
+
+// Undo stack
+const MAX_UNDO = 20;
+let undoStack = [];
+let redoStack = [];
+
+// ==================== API Key ====================
 if (apiKey) {
   apiKeyInput.value = apiKey;
   keyStatus.textContent = '已保存';
@@ -369,16 +795,65 @@ saveKeyBtn.addEventListener('click', () => {
   localStorage.setItem('removebg_key', apiKey);
   keyStatus.textContent = '已保存';
   keyStatus.style.color = 'var(--accent)';
+  showToast('API Key 已保存');
 });
 
-function setStatus(msg) { statusText.textContent = msg; }
+// ==================== Toast ====================
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  toast.textContent = msg;
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
 
+// ==================== UI Phase Management ====================
+function setPhase(p) {
+  phase = p;
+  const inEdit = p === 'editing';
+  contentRow.style.display = inEdit ? 'none' : '';
+  editorWorkspace.classList.toggle('active', inEdit);
+}
+
+function goIdle() {
+  setPhase('idle');
+  originalFile = null;
+  resultBlob = null;
+  beforeImg.src = ''; beforeImg.style.display = 'none'; beforePh.style.display = '';
+  afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
+  downloadBtn.disabled = true;
+  editBtn.style.display = 'none';
+  clearImgBtn.style.display = 'none';
+  clearResultBtn.style.display = 'none';
+  uploadBtn.textContent = '选择图片';
+  statusText.textContent = '设置 API Key 后即可使用';
+  thumbOrigImg.src = ''; thumbOrigImg.style.display = 'none'; thumbOrigPh.style.display = '';
+  thumbResImg.src = ''; thumbResImg.style.display = 'none'; thumbResPh.style.display = '';
+  uploadCard.style.display = '';
+}
+
+function goUploaded() {
+  setPhase('uploaded');
+  uploadBtn.textContent = '重新选择';
+  statusText.textContent = '点击编辑或重新上传';
+  editBtn.style.display = 'none';
+  clearImgBtn.style.display = '';
+  clearResultBtn.style.display = 'none';
+}
+
+function goDone() {
+  setPhase('done');
+  editBtn.style.display = '';
+  clearImgBtn.style.display = '';
+  clearResultBtn.style.display = '';
+  downloadBtn.disabled = false;
+  statusText.textContent = '处理完成';
+}
+
+// ==================== API Call ====================
 async function removeBackground(file) {
-  if (!apiKey) {
-    alert('请先设置 Remove.bg API Key');
-    return;
-  }
-
+  if (!apiKey) { alert('请先设置 Remove.bg API Key'); return; }
+  setPhase('processing');
   beforeBox.classList.add('processing');
   statusSpan.textContent = 'AI 处理中...';
 
@@ -395,94 +870,793 @@ async function removeBackground(file) {
 
     if (!resp.ok) {
       let msg = 'API 请求失败';
-      try {
-        const err = await resp.json();
-        msg = err.errors?.[0]?.title || 'API error ' + resp.status;
-      } catch (_) {}
-      // Handle rate limit
-      if (resp.status === 429) {
-        msg = '免费额度已用完（每月 50 张），请下月再试或升级套餐';
-      }
+      try { const err = await resp.json(); msg = err.errors?.[0]?.title || 'API error ' + resp.status; } catch (_) {}
+      if (resp.status === 429) msg = '免费额度已用完（每月 50 张），请下月再试';
       throw new Error(msg);
     }
 
     resultBlob = await resp.blob();
     const resultUrl = URL.createObjectURL(resultBlob);
-    afterImg.src = resultUrl;
-    afterImg.style.display = 'block';
-    afterPh.style.display = 'none';
-    downloadBtn.disabled = false;
-    setStatus('处理完成');
+    afterImg.src = resultUrl; afterImg.style.display = 'block'; afterPh.style.display = 'none';
+    thumbResImg.src = resultUrl; thumbResImg.style.display = 'block'; thumbResPh.style.display = 'none';
+    thumbResult.classList.add('active');
+    goDone();
   } catch (e) {
     console.error('Remove.bg failed:', e);
     alert('抠图失败：' + e.message);
-    afterPh.style.display = 'block';
-    afterImg.style.display = 'none';
-    setStatus('处理失败：' + e.message);
+    afterPh.style.display = 'block'; afterImg.style.display = 'none';
+    statusText.textContent = '处理失败：' + e.message;
   } finally {
     beforeBox.classList.remove('processing');
   }
 }
 
-// File handling
+// ==================== File Handling ====================
 function handleFile(file) {
   if (!file) return;
-  if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-    alert('请上传 PNG、JPG 或 WebP 格式的图片');
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    alert('图片大小不能超过 10MB');
-    return;
-  }
+  if (!/^image/(png|jpeg|webp)$/.test(file.type)) { alert('请上传 PNG、JPG 或 WebP 格式'); return; }
+  if (file.size > 10 * 1024 * 1024) { alert('图片不能超过 10MB'); return; }
 
   originalFile = file;
   const url = URL.createObjectURL(file);
-  beforeImg.src = url;
-  beforeImg.style.display = 'block';
-  beforePh.style.display = 'none';
-  afterImg.style.display = 'none';
-  afterPh.style.display = 'block';
+  beforeImg.src = url; beforeImg.style.display = 'block'; beforePh.style.display = 'none';
+  afterImg.style.display = 'none'; afterPh.style.display = 'block';
   downloadBtn.disabled = true;
+  editBtn.style.display = 'none';
 
+  thumbOrigImg.src = url; thumbOrigImg.style.display = 'block'; thumbOrigPh.style.display = 'none';
+
+  goUploaded();
   removeBackground(file);
 }
 
-// Upload triggers
 uploadBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => {
-  handleFile(e.target.files[0]);
-  fileInput.value = '';
-});
+fileInput.addEventListener('change', e => { handleFile(e.target.files[0]); fileInput.value = ''; });
 
 // Drag & drop
-const uploadCard = document.getElementById('uploadCard');
-uploadCard.addEventListener('dragover', (e) => { e.preventDefault(); uploadCard.classList.add('drag-over'); });
+uploadCard.addEventListener('dragover', e => { e.preventDefault(); uploadCard.classList.add('drag-over'); });
 uploadCard.addEventListener('dragleave', () => uploadCard.classList.remove('drag-over'));
-uploadCard.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadCard.classList.remove('drag-over');
+uploadCard.addEventListener('drop', e => {
+  e.preventDefault(); uploadCard.classList.remove('drag-over');
+  if (phase === 'editing') return;
   handleFile(e.dataTransfer.files[0]);
 });
-document.body.addEventListener('dragover', (e) => e.preventDefault());
-document.body.addEventListener('drop', (e) => {
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
   e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
+  if (phase === 'editing') return;
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
 });
 
 // Download
-downloadBtn.addEventListener('click', () => {
-  if (!resultBlob) return;
-  const url = URL.createObjectURL(resultBlob);
+downloadBtn.addEventListener('click', () => downloadBlob(resultBlob));
+editorDownloadBtn.addEventListener('click', () => downloadBlob(resultBlob));
+
+function downloadBlob(blob) {
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = (originalFile?.name || 'image').replace(/\.[^.]+$/, '') + '_nobg.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  a.download = (originalFile?.name || 'image').replace(/.[^.]+$/, '') + '_nobg.png';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// Clear actions
+clearImgBtn.addEventListener('click', () => { if (phase !== 'editing') goIdle(); });
+clearResultBtn.addEventListener('click', () => {
+  if (phase !== 'editing') {
+    resultBlob = null;
+    afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
+    thumbResImg.src = ''; thumbResImg.style.display = 'none'; thumbResPh.style.display = '';
+    downloadBtn.disabled = true;
+    editBtn.style.display = 'none';
+    clearResultBtn.style.display = 'none';
+    goUploaded();
+  }
 });
+
+// ==================== Canvas Core ====================
+function loadImage(fileOrBlob) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(fileOrBlob);
+  });
+}
+
+async function enterEditor() {
+  if (!resultBlob || !originalFile) return;
+
+  setPhase('editing');
+  uploadCard.style.display = 'none';
+
+  // Load images
+  sourceImg = await loadImage(originalFile);
+  resultImg = await loadImage(resultBlob);
+
+  // Determine canvas size (clamp to 1200px max dimension)
+  const maxDim = 1200;
+  const w = resultImg.naturalWidth;
+  const h = resultImg.naturalHeight;
+  const scale = Math.min(1, maxDim / Math.max(w, h));
+  canvasW = Math.round(w * scale);
+  canvasH = Math.round(h * scale);
+
+  // Setup canvases
+  editCanvas.width = canvasW;
+  editCanvas.height = canvasH;
+
+  maskCanvas = document.createElement('canvas');
+  maskCanvas.width = canvasW;
+  maskCanvas.height = canvasH;
+  maskCtx = maskCanvas.getContext('2d');
+  maskCtx.fillStyle = '#fff';
+  maskCtx.fillRect(0, 0, canvasW, canvasH);
+
+  // Reset state
+  zoom = 1;
+  panX = 0;
+  panY = 0;
+  undoStack = [];
+  redoStack = [];
+  undoBtn.disabled = true;
+  redoBtn.disabled = true;
+  clearSelection();
+  fitCanvas();
+
+  // Update thumbnails
+  thumbOriginal.classList.add('active');
+  thumbResult.classList.remove('active');
+
+  render();
+  showToast('编辑器中：使用左侧工具修改抠图结果');
+}
+
+function fitCanvas() {
+  const rect = canvasContainer.getBoundingClientRect();
+  const scaleW = (rect.width - 40) / canvasW;
+  const scaleH = (rect.height - 40) / canvasH;
+  zoom = Math.min(scaleW, scaleH, 1);
+  panX = (rect.width - canvasW * zoom) / 2;
+  panY = (rect.height - canvasH * zoom) / 2;
+  render();
+}
+
+function screenToCanvas(sx, sy) {
+  const rect = editCanvas.getBoundingClientRect();
+  return {
+    x: (sx - rect.left - panX) / zoom,
+    y: (sy - rect.top - panY) / zoom,
+  };
+}
+
+function render() {
+  const ctx = editCanvas.getContext('2d');
+  const w = canvasW, h = canvasH;
+
+  // Clear with transparent
+  ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+
+  ctx.save();
+  ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
+
+  // Draw result image
+  ctx.drawImage(resultImg, 0, 0, w, h);
+
+  // Apply mask: get image data, multiply alpha by mask
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const maskData = maskCtx.getImageData(0, 0, w, h);
+  const px = imgData.data;
+  const mp = maskData.data;
+
+  for (let i = 0; i < w * h; i++) {
+    px[i * 4 + 3] = Math.round(px[i * 4 + 3] * (mp[i * 4] / 255));
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  // Draw selection overlay
+  if (hasSelection && selectionMask) {
+    const overlay = ctx.createImageData(w, h);
+    const od = overlay.data;
+    for (let i = 0; i < w * h; i++) {
+      if (selectionMask[i]) {
+        od[i * 4] = 0;
+        od[i * 4 + 1] = 200;
+        od[i * 4 + 2] = 150;
+        od[i * 4 + 3] = 80;
+      }
+    }
+    ctx.putImageData(overlay, 0, 0);
+  }
+
+  // Draw lasso polygon in progress
+  if (activeTool === 'lasso' && lassoPoints.length > 0) {
+    ctx.strokeStyle = 'rgba(0,200,150,0.9)';
+    ctx.lineWidth = 2 / zoom;
+    ctx.setLineDash([6 / zoom, 4 / zoom]);
+    ctx.beginPath();
+    ctx.moveTo(lassoPoints[0].x, lassoPoints[0].y);
+    for (let i = 1; i < lassoPoints.length; i++) {
+      ctx.lineTo(lassoPoints[i].x, lassoPoints[i].y);
+    }
+    if (!lassoClosed) {
+      const last = lassoPoints[lassoPoints.length - 1];
+      ctx.lineTo(last.x, last.y);
+    } else {
+      ctx.closePath();
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw vertices
+    ctx.fillStyle = 'var(--accent)';
+    for (const pt of lassoPoints) {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 3 / zoom, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  ctx.restore();
+  zoomInfo.textContent = Math.round(zoom * 100) + '%';
+}
+
+// ==================== Zoom / Pan ====================
+canvasContainer.addEventListener('wheel', e => {
+  if (phase !== 'editing') return;
+  e.preventDefault();
+  const rect = editCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const oldZoom = zoom;
+  zoom = Math.max(0.1, Math.min(5, zoom - e.deltaY * 0.001));
+  const ratio = zoom / oldZoom;
+  panX = mx - ratio * (mx - panX);
+  panY = my - ratio * (my - panY);
+
+  render();
+}, { passive: false });
+
+canvasContainer.addEventListener('mousedown', e => {
+  if (phase !== 'editing') return;
+  const rect = editCanvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left;
+  const sy = e.clientY - rect.top;
+
+  // Middle button or space+left = pan
+  if (e.button === 1 || (e.button === 0 && e.altKey)) {
+    isPanning = true;
+    panStartX = sx;
+    panStartY = sy;
+    panStartPX = panX;
+    panStartPY = panY;
+    canvasContainer.style.cursor = 'grabbing';
+    e.preventDefault();
+    return;
+  }
+
+  if (e.button !== 0) return;
+
+  const { x, y } = screenToCanvas(e.clientX, e.clientY);
+  if (x < 0 || y < 0 || x > canvasW || y > canvasH) return;
+
+  if (activeTool === 'eraser') eraserStart(x, y);
+  else if (activeTool === 'lasso') lassoClick(x, y);
+  else if (activeTool === 'wand') wandClick(x, y);
+});
+
+canvasContainer.addEventListener('mousemove', e => {
+  if (phase !== 'editing') return;
+  const rect = editCanvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left;
+  const sy = e.clientY - rect.top;
+
+  if (isPanning) {
+    panX = panStartPX + (sx - panStartX);
+    panY = panStartPY + (sy - panStartY);
+    render();
+    return;
+  }
+
+  const { x, y } = screenToCanvas(e.clientX, e.clientY);
+
+  // Brush preview
+  if (activeTool === 'eraser') {
+    brushPreview.style.display = 'block';
+    brushPreview.style.width = (brushSize * zoom) + 'px';
+    brushPreview.style.height = (brushSize * zoom) + 'px';
+    brushPreview.style.left = (x * zoom + panX) + 'px';
+    brushPreview.style.top = (y * zoom + panY) + 'px';
+  } else {
+    brushPreview.style.display = 'none';
+  }
+
+  if (activeTool === 'eraser' && eraserDown) eraserMove(x, y);
+});
+
+canvasContainer.addEventListener('mouseup', e => {
+  isPanning = false;
+  canvasContainer.style.cursor = '';
+
+  if (activeTool === 'eraser' && eraserDown) eraserEnd();
+});
+
+canvasContainer.addEventListener('mouseleave', () => {
+  isPanning = false;
+  brushPreview.style.display = 'none';
+  if (eraserDown) eraserEnd();
+});
+
+// Touch support
+canvasContainer.addEventListener('touchstart', e => {
+  if (phase !== 'editing') return;
+  if (e.touches.length === 2) { isPanning = true; e.preventDefault(); return; }
+  if (e.touches.length !== 1) return;
+  const t = e.touches[0];
+  const { x, y } = screenToCanvas(t.clientX, t.clientY);
+  if (activeTool === 'eraser') eraserStart(x, y);
+  else if (activeTool === 'lasso') lassoClick(x, y);
+  else if (activeTool === 'wand') wandClick(x, y);
+  e.preventDefault();
+}, { passive: false });
+
+canvasContainer.addEventListener('touchmove', e => {
+  if (phase !== 'editing') return;
+  if (isPanning && e.touches.length === 2) { e.preventDefault(); return; }
+  if (e.touches.length !== 1) return;
+  const t = e.touches[0];
+  const { x, y } = screenToCanvas(t.clientX, t.clientY);
+  if (activeTool === 'eraser' && eraserDown) eraserMove(x, y);
+  e.preventDefault();
+}, { passive: false });
+
+canvasContainer.addEventListener('touchend', e => {
+  isPanning = false;
+  if (activeTool === 'eraser' && eraserDown) eraserEnd();
+});
+
+// Zoom buttons
+canvasContainer.addEventListener('dblclick', e => {
+  if (phase !== 'editing') return;
+  e.preventDefault();
+  fitCanvas();
+});
+
+// ==================== Undo / Redo ====================
+function pushUndo() {
+  redoStack = [];
+  undoStack.push(maskCtx.getImageData(0, 0, canvasW, canvasH));
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  undoBtn.disabled = false;
+  redoBtn.disabled = true;
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(maskCtx.getImageData(0, 0, canvasW, canvasH));
+  maskCtx.putImageData(undoStack.pop(), 0, 0);
+  undoBtn.disabled = !undoStack.length;
+  redoBtn.disabled = false;
+  render();
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(maskCtx.getImageData(0, 0, canvasW, canvasH));
+  maskCtx.putImageData(redoStack.pop(), 0, 0);
+  undoBtn.disabled = false;
+  redoBtn.disabled = !redoStack.length;
+  render();
+}
+
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
+
+// ==================== Clear Selection ====================
+function clearSelection() {
+  selectionMask = null;
+  hasSelection = false;
+  lassoPoints = [];
+  lassoClosed = false;
+  floatingActions.classList.remove('show');
+  $('clearSelectionBtn').style.display = 'none';
+}
+
+$('clearSelectionBtn').addEventListener('click', clearSelection);
+
+// ==================== Eraser Tool ====================
+function eraserStart(x, y) {
+  pushUndo();
+  eraserDown = true;
+  eraserLastX = x;
+  eraserLastY = y;
+  paintCircle(x, y);
+  render();
+}
+
+function eraserMove(x, y) {
+  if (!eraserDown) return;
+  const dist = Math.hypot(x - eraserLastX, y - eraserLastY);
+  const step = Math.max(1, Math.ceil(dist / (brushSize / 4)));
+  for (let i = 1; i <= step; i++) {
+    const t = i / step;
+    paintCircle(eraserLastX + (x - eraserLastX) * t, eraserLastY + (y - eraserLastY) * t);
+  }
+  eraserLastX = x;
+  eraserLastY = y;
+  render();
+}
+
+function eraserEnd() { eraserDown = false; }
+
+function paintCircle(cx, cy) {
+  maskCtx.fillStyle = eraseMode === 'erase' ? '#000' : '#fff';
+  maskCtx.beginPath();
+  maskCtx.arc(cx, cy, brushSize / 2, 0, Math.PI * 2);
+  maskCtx.fill();
+}
+
+// ==================== Lasso Tool ====================
+function lassoClick(x, y) {
+  // Check if closing polygon (within 8px of first point)
+  if (lassoPoints.length >= 3) {
+    const first = lassoPoints[0];
+    if (Math.hypot(x - first.x, y - first.y) < 8) {
+      closeLasso();
+      return;
+    }
+  }
+  lassoPoints.push({ x, y });
+  render();
+}
+
+function closeLasso() {
+  if (lassoPoints.length < 3) return;
+  lassoClosed = true;
+  render();
+
+  // Fill selection mask using even-odd rule
+  const w = canvasW, h = canvasH;
+  selectionMask = new Uint8Array(w * h);
+
+  // Bounding box
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const pt of lassoPoints) {
+    minX = Math.min(minX, pt.x); maxX = Math.max(maxX, pt.x);
+    minY = Math.min(minY, pt.y); maxY = Math.max(maxY, pt.y);
+  }
+  minX = Math.max(0, Math.floor(minX) - 1);
+  minY = Math.max(0, Math.floor(minY) - 1);
+  maxX = Math.min(w - 1, Math.ceil(maxX) + 1);
+  maxY = Math.min(h - 1, Math.ceil(maxY) + 1);
+
+  const pts = lassoPoints;
+  const n = pts.length;
+
+  for (let py = minY; py <= maxY; py++) {
+    const intersections = [];
+    for (let i = 0; i < n; i++) {
+      const a = pts[i], b = pts[(i + 1) % n];
+      if ((a.y <= py && b.y > py) || (b.y <= py && a.y > py)) {
+        const xInt = a.x + (py - a.y) / (b.y - a.y) * (b.x - a.x);
+        intersections.push(xInt);
+      }
+    }
+    intersections.sort((a, b) => a - b);
+    for (let i = 0; i < intersections.length - 1; i += 2) {
+      const sx = Math.max(minX, Math.ceil(intersections[i]));
+      const ex = Math.min(maxX, Math.floor(intersections[i + 1]));
+      for (let px = sx; px <= ex; px++) {
+        selectionMask[py * w + px] = 1;
+      }
+    }
+  }
+
+  hasSelection = true;
+  render();
+  showFloatingActions();
+}
+
+function showFloatingActions() {
+  if (!lassoPoints.length) return;
+  // Position near last clicked point
+  const last = lassoPoints[lassoPoints.length - 1];
+  floatingActions.style.left = (last.x * zoom + panX + 10) + 'px';
+  floatingActions.style.top = (last.y * zoom + panY + 10) + 'px';
+  floatingActions.classList.add('show');
+  $('clearSelectionBtn').style.display = '';
+}
+
+// ==================== Smart Select (Wand) ====================
+function wandClick(x, y) {
+  const cx = Math.round(x), cy = Math.round(y);
+  if (cx < 0 || cy < 0 || cx >= canvasW || cy >= canvasH) return;
+
+  // Get source color at click point
+  const ctx = editCanvas.getContext('2d');
+  const pixel = ctx.getImageData(cx, cy, 1, 1).data;
+
+  const w = canvasW, h = canvasH;
+  selectionMask = new Uint8Array(w * h);
+  const visited = new Uint8Array(w * h);
+
+  // BFS flood fill
+  const queue = [cy * w + cx];
+  visited[cy * w + cx] = 1;
+  let head = 0;
+  const threshold = tolerance * 4.42;
+  const maxPixels = 200000;
+  let count = 0;
+
+  // Read all result pixels once
+  const imgData = resultImg ? (() => {
+    const tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    const tctx = tmp.getContext('2d');
+    tctx.drawImage(resultImg, 0, 0, w, h);
+    return tctx.getImageData(0, 0, w, h).data;
+  })() : null;
+
+  if (!imgData) return;
+
+  const srcR = pixel[0], srcG = pixel[1], srcB = pixel[2];
+
+  while (head < queue.length && count < maxPixels) {
+    const idx = queue[head++];
+    const px = idx % w, py = Math.floor(idx / w);
+    selectionMask[idx] = 1;
+    count++;
+
+    const neighbors = [
+      px > 0 ? idx - 1 : -1,
+      px < w - 1 ? idx + 1 : -1,
+      py > 0 ? idx - w : -1,
+      py < h - 1 ? idx + w : -1,
+    ];
+
+    for (const nidx of neighbors) {
+      if (nidx < 0 || visited[nidx]) continue;
+      const r = imgData[nidx * 4], g = imgData[nidx * 4 + 1], b = imgData[nidx * 4 + 2];
+      const dist = Math.sqrt((r - srcR) ** 2 + (g - srcG) ** 2 + (b - srcB) ** 2);
+      if (dist <= threshold) {
+        visited[nidx] = 1;
+        queue.push(nidx);
+      }
+    }
+  }
+
+  hasSelection = true;
+  lassoPoints = [{ x: cx, y: cy }]; // for floating actions positioning
+  render();
+  showFloatingActions();
+}
+
+// ==================== Floating Actions ====================
+floatingActions.querySelector('[data-action="delete"]').addEventListener('click', () => {
+  applySelection('erase');
+});
+
+floatingActions.querySelector('[data-action="restore"]').addEventListener('click', () => {
+  applySelection('restore');
+});
+
+floatingActions.querySelector('[data-action="cancel"]').addEventListener('click', () => {
+  clearSelection();
+  render();
+});
+
+function applySelection(mode) {
+  if (!hasSelection || !selectionMask) return;
+  pushUndo();
+
+  const imgData = maskCtx.getImageData(0, 0, canvasW, canvasH);
+  const d = imgData.data;
+  const fillVal = mode === 'erase' ? 0 : 255;
+
+  for (let i = 0; i < canvasW * canvasH; i++) {
+    if (selectionMask[i]) {
+      d[i * 4] = fillVal;
+      d[i * 4 + 1] = fillVal;
+      d[i * 4 + 2] = fillVal;
+    }
+  }
+  maskCtx.putImageData(imgData, 0, 0);
+  clearSelection();
+  render();
+}
+
+// ==================== Tool Switching ====================
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTool = btn.dataset.tool;
+    clearSelection();
+    render();
+
+    // Update cursor
+    canvasContainer.classList.remove('eraser-cursor', 'lasso-cursor', 'wand-cursor');
+    if (activeTool === 'eraser') canvasContainer.classList.add('eraser-cursor');
+    else if (activeTool === 'lasso') canvasContainer.classList.add('lasso-cursor');
+    else if (activeTool === 'wand') canvasContainer.classList.add('wand-cursor');
+
+    // Show/hide relevant groups
+    $('brushGroup').style.display = activeTool === 'eraser' ? '' : 'none';
+    $('modeGroup').style.display = activeTool === 'eraser' ? '' : 'none';
+    $('toleranceGroup').style.display = activeTool === 'wand' ? '' : 'none';
+  });
+});
+
+// Default: eraser cursor
+canvasContainer.classList.add('eraser-cursor');
+
+// Brush size
+$('brushSize').addEventListener('input', e => {
+  brushSize = parseInt(e.target.value);
+  $('brushSizeVal').textContent = brushSize;
+});
+
+// Tolerance
+$('tolerance').addEventListener('input', e => {
+  tolerance = parseInt(e.target.value);
+  $('toleranceVal').textContent = tolerance;
+});
+
+// Erase mode toggle
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    eraseMode = btn.dataset.mode;
+  });
+});
+
+// ==================== Apply / Cancel ====================
+applyBtn.addEventListener('click', async () => {
+  if (phase !== 'editing') return;
+
+  // Render final composite at full resolution
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = resultImg.naturalWidth;
+  outCanvas.height = resultImg.naturalHeight;
+  const outCtx = outCanvas.getContext('2d');
+
+  outCtx.drawImage(resultImg, 0, 0);
+
+  // Scale mask to full resolution
+  const scaleMask = document.createElement('canvas');
+  scaleMask.width = resultImg.naturalWidth;
+  scaleMask.height = resultImg.naturalHeight;
+  const smCtx = scaleMask.getContext('2d');
+  smCtx.drawImage(maskCanvas, 0, 0, resultImg.naturalWidth, resultImg.naturalHeight);
+
+  const imgData = outCtx.getImageData(0, 0, outCanvas.width, outCanvas.height);
+  const maskData = smCtx.getImageData(0, 0, outCanvas.width, outCanvas.height);
+  const d = imgData.data, m = maskData.data;
+
+  for (let i = 0; i < outCanvas.width * outCanvas.height; i++) {
+    d[i * 4 + 3] = Math.round(d[i * 4 + 3] * (m[i * 4] / 255));
+  }
+  outCtx.putImageData(imgData, 0, 0);
+
+  resultBlob = await new Promise(r => outCanvas.toBlob(r, 'image/png'));
+  const url = URL.createObjectURL(resultBlob);
+  afterImg.src = url;
+  thumbResImg.src = url;
+
+  exitEditor();
+  goDone();
+  showToast('编辑已应用');
+});
+
+cancelEditBtn.addEventListener('click', () => {
+  exitEditor();
+  goDone();
+  showToast('编辑已取消');
+});
+
+function exitEditor() {
+  setPhase('done');
+  uploadCard.style.display = '';
+  sourceImg = null;
+  resultImg = null;
+  maskCanvas = null;
+  clearSelection();
+}
+
+// ==================== Thumbnail Preview ====================
+let previewMode = 'result'; // 'result' | 'original'
+let thumbPreviewTimer = null;
+
+thumbOriginal.addEventListener('mousedown', () => {
+  if (phase !== 'editing') return;
+  showOriginalPreview();
+});
+thumbOriginal.addEventListener('mouseup', () => showResultPreview());
+thumbOriginal.addEventListener('mouseleave', () => showResultPreview());
+
+thumbResult.addEventListener('click', () => {
+  if (phase !== 'editing') return;
+  thumbResult.classList.add('active');
+  thumbOriginal.classList.remove('active');
+  showResultPreview();
+});
+
+function showOriginalPreview() {
+  if (phase !== 'editing') return;
+  const ctx = editCanvas.getContext('2d');
+  ctx.save();
+  ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
+  ctx.clearRect(0, 0, canvasW, canvasH);
+  ctx.drawImage(sourceImg, 0, 0, canvasW, canvasH);
+  ctx.restore();
+}
+
+function showResultPreview() {
+  if (phase !== 'editing') render();
+}
+
+// ==================== Side Panel Clear Buttons ====================
+editorClearImgBtn.addEventListener('click', () => {
+  exitEditor();
+  goIdle();
+  showToast('图片已清除');
+});
+
+editorClearResultBtn.addEventListener('click', () => {
+  resultBlob = null;
+  afterImg.src = ''; afterImg.style.display = 'none'; afterPh.style.display = '';
+  thumbResImg.src = ''; thumbResImg.style.display = 'none'; thumbResPh.style.display = '';
+  goUploaded();
+  showToast('结果已清除');
+});
+
+backToDefaultBtn.addEventListener('click', () => {
+  exitEditor();
+  goIdle();
+});
+
+// ==================== Edit Button ====================
+editBtn.addEventListener('click', () => enterEditor());
+
+// ==================== Keyboard Shortcuts ====================
+document.addEventListener('keydown', e => {
+  if (phase !== 'editing') return;
+
+  if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+  if (e.ctrlKey && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+  if (e.key === 'Escape') { clearSelection(); render(); }
+  if (e.key === 'f' && !e.ctrlKey) { e.preventDefault(); fitCanvas(); }
+  if (e.key === '1') { document.querySelector('[data-tool="eraser"]').click(); }
+  if (e.key === '2') { document.querySelector('[data-tool="lasso"]').click(); }
+  if (e.key === '3') { document.querySelector('[data-tool="wand"]').click(); }
+
+  // Space = temp pan
+  if (e.code === 'Space' && !e.repeat) {
+    e.preventDefault();
+    canvasContainer.style.cursor = 'grab';
+  }
+});
+
+document.addEventListener('keyup', e => {
+  if (e.code === 'Space' && !isPanning) {
+    canvasContainer.style.cursor = '';
+  }
+});
+
+// ==================== Window Resize ====================
+window.addEventListener('resize', () => {
+  if (phase === 'editing') fitCanvas();
+});
+
+// ==================== Init ====================
+goIdle();
+console.log('App ready - V2 with editor');
 </script>
 </body>
 </html>
