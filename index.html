@@ -894,7 +894,7 @@ async function removeBackground(file) {
 // ==================== File Handling ====================
 function handleFile(file) {
   if (!file) return;
-  if (!/^image/(png|jpeg|webp)$/.test(file.type)) { alert('请上传 PNG、JPG 或 WebP 格式'); return; }
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type)) { alert('请上传 PNG、JPG 或 WebP 格式'); return; }
   if (file.size > 10 * 1024 * 1024) { alert('图片不能超过 10MB'); return; }
 
   originalFile = file;
